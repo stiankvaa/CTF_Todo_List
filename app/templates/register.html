@@ -5,7 +5,9 @@
 
 {% block content %}
     <form action="/register" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <h1>Please fill all input fields</h1>
+
         <input type="text" id="username" name="username" placeholder="Enter Username" class="form-control">
         <input type="password" id="password" name="password" placeholder="Enter Password" class="form-control">
         <select id="role" name="role" class="form-control" disabled>

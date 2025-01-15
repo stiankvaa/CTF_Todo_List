@@ -10,10 +10,11 @@
         {% endif %}
 
 <div class="content">
-    <img src="{{ url_for('serve_image', image_name='cute.png') }}" alt="Image from Flask">
+    <img src="{{ url_for('serve_image', image_name='cute.png') }}">
 </div>
 
     <form action="/waiting" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
         <input type="submit" value="Get message from admin" id="get_message">
         <input name="file" value="message.txt" hidden></input>
     </form>

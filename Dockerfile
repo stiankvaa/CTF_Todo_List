@@ -1,15 +1,17 @@
 # Start from a lightweight base image
 FROM python:3.12
+USER nonroot
+
 
 # Set the working directory in the container
-WORKDIR .
+WORKDIR /app/
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
 RUN pip install -r requirements.txt
 
 # Copy the Flask app into the container
-COPY . .
+COPY . /app/
 
 # Expose the port that Flask will run on
 EXPOSE 5000
