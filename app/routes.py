@@ -13,10 +13,12 @@ CONST_LOGIN = "login.html"
 CONST_WAIT = "wait.html"
 CONST_LIST = "list.html"
 
+
 class LoginForm(FlaskForm):
     username = StringField("Username", validators=[DataRequired()])
     password = PasswordField("Password", validators=[DataRequired()])
     submit = SubmitField("Login")
+
 
 def jwt_required(f):
     @wraps(f)
@@ -43,7 +45,7 @@ def home():
 
 @app.route("/waiting", methods=["GET"])
 @jwt_required
-def waitingGET(data):
+def waiting_get(data):
     return render_template(
         CONST_WAIT, user=data["user"], group=data["group"]
     )
@@ -51,7 +53,7 @@ def waitingGET(data):
 
 @app.route("/waiting", methods=["POST"])
 @jwt_required
-def waitingPOST(data):
+def waiting_post(data):
     ALLOWED_FILES = ["flag/flag.txt", "message.txt"]
     file = request.form.get("file")
     try:
@@ -88,12 +90,12 @@ def serve_image(image_name):
 
 
 @app.route("/register", methods=["GET"])
-def registerGET():
+def register_get():
     return render_template("register.html")
 
 
 @app.route("/register", methods=["POST"])
-def register_POST():
+def register_post():
     try:
         db_config.add_user(
             request.form.get("username"),
@@ -105,7 +107,6 @@ def register_POST():
         return render_template("register.html")
     form = LoginForm()
     return render_template(CONST_LOGIN, msg="User created! Please log in.", form=form)
-
 
 
 # The POST request for getting the username and password.
@@ -141,7 +142,7 @@ def login():
 
 @app.route("/list", methods=["GET"])
 @jwt_required
-def indexGet(data):
+def index_get(data):
     tasks = conf.Todo.query.order_by(conf.Todo.date_created).all()
     return render_template(
         CONST_LIST, tasks=tasks, user=data["user"], group=data["group"]
@@ -150,7 +151,7 @@ def indexGet(data):
 
 @app.route("/list", methods=["POST"])
 @jwt_required
-def indexPost(data):
+def index_post(data):
     new_task = conf.Todo(content=request.form["content"], user=data["user"])
     try:
         conf.db.session.add(new_task)
@@ -186,7 +187,7 @@ def delete(id, data):
 
 @app.route("/update/<int:id>", methods=["GET"])
 @jwt_required
-def updateGET(id, data):
+def update_get(id, data):
     task = conf.Todo.query.get_or_404(id)
     # Check if the logged-in user owns the task
     if task.user != data["user"]:
@@ -194,9 +195,10 @@ def updateGET(id, data):
             "update.html", task=task, user=data["user"], group=data["group"]
         )
 
+
 @app.route("/update/<int:id>", methods=["POST"])
 @jwt_required
-def updatePOST(id, data):
+def update_post(id, data):
     task = conf.Todo.query.get_or_404(id)
     if task.user != data["user"]:
         return render_template(
