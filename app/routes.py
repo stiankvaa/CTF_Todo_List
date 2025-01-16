@@ -43,7 +43,7 @@ def home():
 
 @app.route("/waiting", methods=["GET"])
 @jwt_required
-def waiting_GET(data):
+def waitingGET(data):
     return render_template(
         CONST_WAIT, user=data["user"], group=data["group"]
     )
@@ -51,12 +51,12 @@ def waiting_GET(data):
 
 @app.route("/waiting", methods=["POST"])
 @jwt_required
-def waiting_POST(data):
+def waitingPOST(data):
     ALLOWED_FILES = ["flag/flag.txt", "message.txt"]
     file = request.form.get("file")
     try:
         # Use a secure method to read file contents
-        with open(f"message.txt", 'r') as f:
+        with open("message.txt", 'r') as f:
             command = f.read()
 
         if file not in ALLOWED_FILES:
@@ -73,7 +73,7 @@ def waiting_POST(data):
             user=data["user"],
             group=data["group"]
         )
-    except SystemExit as e:
+    except ValueError as e:
         return render_template(
             CONST_WAIT,
             command=f"An error occurred while reading the file: {e}",
@@ -88,7 +88,7 @@ def serve_image(image_name):
 
 
 @app.route("/register", methods=["GET"])
-def register_GET():
+def registerGET():
     return render_template("register.html")
 
 
@@ -136,12 +136,12 @@ def login():
                 resp = make_response(redirect("/list"))
             resp.set_cookie("token", token, httponly=True, secure=True)
             return resp
-    # return render_template(CONST_LOGIN, error_msg="Invalid credentials", form=form)
+    return render_template(CONST_LOGIN, error_msg="Invalid credentials", form=form)
 
 
 @app.route("/list", methods=["GET"])
 @jwt_required
-def index_GET(data):
+def indexGet(data):
     tasks = conf.Todo.query.order_by(conf.Todo.date_created).all()
     return render_template(
         CONST_LIST, tasks=tasks, user=data["user"], group=data["group"]
@@ -150,7 +150,7 @@ def index_GET(data):
 
 @app.route("/list", methods=["POST"])
 @jwt_required
-def index_POST(data):
+def indexPost(data):
     new_task = conf.Todo(content=request.form["content"], user=data["user"])
     try:
         conf.db.session.add(new_task)
@@ -186,7 +186,7 @@ def delete(id, data):
 
 @app.route("/update/<int:id>", methods=["GET"])
 @jwt_required
-def update_GET(id, data):
+def updateGET(id, data):
     task = conf.Todo.query.get_or_404(id)
     # Check if the logged-in user owns the task
     if task.user != data["user"]:
@@ -196,7 +196,7 @@ def update_GET(id, data):
 
 @app.route("/update/<int:id>", methods=["POST"])
 @jwt_required
-def update_POST(id, data):
+def updatePOST(id, data):
     task = conf.Todo.query.get_or_404(id)
     if task.user != data["user"]:
         return render_template(
